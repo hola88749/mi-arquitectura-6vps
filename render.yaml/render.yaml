@@ -1,0 +1,16 @@
+# Exported from Render on 2026-03-25T18:18:26Z
+version: "1"
+projects:
+- name: My project
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: mi-arquitectura-6vps
+      runtime: python
+      repo: https://github.com/hola88749/mi-arquitectura-6vps
+      plan: free
+      region: virginia
+      buildCommand: server.js
+      startCommand: node gateway/index.js
+      autoDeployTrigger: commit
