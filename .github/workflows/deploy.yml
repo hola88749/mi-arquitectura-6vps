@@ -1,44 +1,36 @@
-name: Deploy Infraestructura 6 VPS
-
+name: Deploy Multi-VPS
 on:
   push:
-    branches: [ main ] # Se activa al subir cambios a la rama principal
+    branches: [ main ]
 
 jobs:
   deploy-gateway:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v3
-
-      - name: Desplegar Configuración a Nginx
+      - uses: actions/checkout@v3
+      - name: Deploy Nginx Config (VPS 1)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_GATEWAY }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # 1. Entrar a la carpeta de configuración
-            cd /etc/nginx/conf.d/
-            
-            # 2. Actualizar el archivo de rutas (asumiendo que está en tu repo)
-            # Nota: Este paso requiere que tengas el archivo en tu repo
+            # Ahora buscamos el archivo dentro de la carpeta gateway/
+            sudo cp /home/proyecto/gateway/microservicios /etc/nginx/conf.d/
             sudo service nginx restart
-            echo "Nginx actualizado con el nuevo Route Map"
 
-  deploy-microservicios:
+  deploy-auth:
     needs: deploy-gateway
     runs-on: ubuntu-latest
     steps:
-      - name: Actualizar Apps en los VPS
+      - uses: actions/checkout@v3
+      - name: Deploy Auth Service (VPS 2)
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_AUTH_SERVICE }} # Ejemplo para el VPS 2
+          host: ${{ secrets.HOST_AUTH_SERVICE }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/proyecto/auth
+            cd /home/proyecto/auth-service
             git pull origin main
-            # Si usas PM2 para mantener vivo el proceso:
-            pm2 restart auth-service || node auth-service.js &
-            echo "Microservicio de Auth actualizado"
+            pm2 restart auth-service.js
