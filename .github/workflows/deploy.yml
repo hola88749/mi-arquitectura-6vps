@@ -18,7 +18,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "gateway/microservicios"
           target: "/home/proyecto/"
-          strip_components: 0
+          strip_components: 1
 
       - name: Deploy Nginx Config (VPS 1)
         uses: appleboy/ssh-action@master
@@ -28,21 +28,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             sudo mkdir -p /etc/nginx/conf.d/
-            sudo cp -f /home/proyecto/gateway/microservicios /etc/nginx/conf.d/
+            sudo cp -f /home/proyecto/microservicios /etc/nginx/conf.d/
             sudo nginx -t && sudo systemctl restart nginx
-
-  deploy-auth:
-    needs: deploy-gateway
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - name: Deploy Auth Service (VPS 2)
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_AUTH_SERVICE }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/proyecto/auth-service
-            pm2 restart auth-service.js || pm2 start auth-service.js
