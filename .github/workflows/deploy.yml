@@ -17,23 +17,22 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Crear la carpeta de aterrizaje
-            sudo mkdir -p /home/proyecto
-            sudo chown -R $USER:$USER /home/proyecto
+            # 1. Crear carpeta con permisos del usuario actual
+            mkdir -p /home/${{ secrets.SSH_USER }}/proyecto
             
-            # Crear el archivo directamente desde el script (Saltamos el SCP)
-            cat <<EOF > /home/proyecto/microservicios
+            # 2. Crear el archivo (Uso de comillas en EOF para evitar expansión de variables)
+            cat <<'EOF' > /home/${{ secrets.SSH_USER }}/proyecto/microservicios
             server {
                 listen 80;
                 server_name 20.171.127.68;
                 location / {
-                    root /var/www/html;
-                    index index.html;
+                    return 200 'Gateway Activo - Conserflow';
+                    add_header Content-Type text/plain;
                 }
             }
             EOF
 
-            # Mover a Nginx y reiniciar
-            sudo mkdir -p /etc/nginx/conf.d/
-            sudo cp -f /home/proyecto/microservicios /etc/nginx/conf.d/
-            sudo nginx -t && sudo systemctl restart nginx
+            # 3. Mover a Nginx usando sudo (aquí es donde podría pedir pass)
+            # Usamos -n para que falle rápido si pide password en lugar de quedarse colgado
+            sudo -n cp -f /home/${{ secrets.SSH_USER }}/proyecto/microservicios /etc/nginx/conf.d/
+            sudo -n nginx -t && sudo -n systemctl restart nginx
