@@ -18,6 +18,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "gateway/microservicios"
           target: "/home/proyecto/"
+          strip_components: 0
 
       - name: Deploy Nginx Config (VPS 1)
         uses: appleboy/ssh-action@master
