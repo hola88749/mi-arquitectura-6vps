@@ -1,7 +1,14 @@
 [build]
   functions = "netlify/functions"
 
+# RUTA PARA EL NUEVO MICROSERVICIO (AUTH)
 [[redirects]]
-  from = "/*"
+  from = "/auth/*"
+  to = "/.netlify/functions/auth"
+  status = 200
+
+# RUTA PARA EL MICROSERVICIO DE PRUEBA (EL QUE YA TENÍAS)
+[[redirects]]
+  from = "/status/*"
   to = "/.netlify/functions/prueba"
   status = 200

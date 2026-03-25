@@ -1,0 +1,15 @@
+[build]
+  command = "npm install"
+  functions = "netlify/functions"
+
+# ESTO REEMPLAZA: location /api/auth { proxy_pass http://localhost:3000; }
+[[redirects]]
+  from = "/api/auth/*"
+  to = "/.netlify/functions/gateway"
+  status = 200
+
+# ESTO REEMPLAZA: location / { root /var/www/html; }
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
